@@ -1,98 +1,90 @@
-import java.util.Scanner;
 
-public class Daa4 {
+import java.util.*;
 
-    static boolean isSafe(int[][] board, int row, int col, int n) {
+class Daa4 {
 
-        // Check the same column above the current row
-        for (int i = 0; i < row; i++) {
-            if (board[i][col] == 1) {
-                return false;
-            }
-        }
+    private boolean isValid(int row, int col, int n, char[][] board) {
+
+        int currX = row;
+        int currY = col;
 
         // Check upper-left diagonal
-        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j] == 1) {
+        while (currX >= 0 && currY >= 0) {
+            if (board[currX][currY] == 'Q')
                 return false;
-            }
+
+            currX--;
+            currY--;
         }
 
-        // Check upper-right diagonal
-        for (int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
-            if (board[i][j] == 1) {
+        currX = row;
+        currY = col;
+
+        // Check the same row towards the left
+        while (currY >= 0) {
+            if (board[currX][currY] == 'Q')
                 return false;
-            }
+
+            currY--;
+        }
+
+        currX = row;
+        currY = col;
+
+        // Check lower-left diagonal
+        while (currX < n && currY >= 0) {
+            if (board[currX][currY] == 'Q')
+                return false;
+
+            currX++;
+            currY--;
         }
 
         return true;
     }
 
-    static boolean solveNQueens(int[][] board, int row, int n) {
+    private void solve(int col, char[][] board,
+                       List<List<String>> ans, int n) {
 
         // All queens have been placed
-        if (row == n) {
-            return true;
-        }
+        if (col == n) {
+            List<String> configuration = new ArrayList<>();
 
-        // Try each column in the current row
-        for (int col = 0; col < n; col++) {
-
-            if (isSafe(board, row, col, n)) {
-                board[row][col] = 1;
-
-                if (solveNQueens(board, row + 1, n)) {
-                    return true;
-                }
-
-                // Backtrack
-                board[row][col] = 0;
+            for (int i = 0; i < n; i++) {
+                configuration.add(new String(board[i]));
             }
-        }
 
-        return false;
-    }
-
-    static void printBoard(int[][] board, int n) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter N: ");
-        int n = sc.nextInt();
-
-        int[][] board = new int[n][n];
-
-        System.out.print("Enter first queen's row and column (1-based): ");
-        int row = sc.nextInt() - 1;
-        int col = sc.nextInt() - 1;
-
-        // Validate the first queen's position
-        if (row < 0 || row >= n || col < 0 || col >= n) {
-            System.out.println("Invalid position!");
-            sc.close();
+            ans.add(configuration);
             return;
         }
 
-        board[row][col] = 1;
+        // Try placing a queen in each row of the current column
+        for (int row = 0; row < n; row++) {
 
-        // Check whether the first queen is safe
-        if (!isSafe(board, row, col, n)) {
-            System.out.println("Invalid initial queen position!");
-        } else if (solveNQueens(board, 0, n)) {
-            System.out.println("Solution:");
-            printBoard(board, n);
-        } else {
-            System.out.println("No solution exists for this initial position.");
+            if (isValid(row, col, n, board)) {
+
+                board[row][col] = 'Q';
+
+                solve(col + 1, board, ans, n);
+
+                // Backtrack
+                board[row][col] = '.';
+            }
+        }
+    }
+
+    public List<List<String>> solveNQueens(int n) {
+
+        List<List<String>> ans = new ArrayList<>();
+
+        char[][] board = new char[n][n];
+
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(board[i], '.');
         }
 
-        sc.close();
+        solve(0, board, ans, n);
+
+        return ans;
     }
 }
