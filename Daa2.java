@@ -31,7 +31,7 @@ public class Daa2 {
         PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.freq, b.freq));
         for(int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
-            map.put(ch, map.getOrDefault(ch, 0));
+            map.put(ch, map.getOrDefault(ch, 0) + 1);
         }
 
         for(Map.Entry<Character, Integer> entry : map.entrySet()) {
